@@ -39,35 +39,36 @@
                         @if($license)
                             {{-- Show table if record found --}}
                             <div class="table-responsive">
-                                <table class="table table-primary table-bordered table-hover mt-3" style="font-size: 18px;">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>CNIC</th>
-                                            <th>License Type</th>
-                                            <th>Learner Number</th>
-                                            <th>License Number</th>
-                                            <th>Issue Date</th>
-                                            <th>Expire Date</th>
-                                            <th>Address</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>{{ $license->ApplicantName }}</td>
-                                            <td>{{ $license->CNIC }}</td>
-                                            <td>{{ $license->LicenseType }}</td>
-                                            <td>{{ $license->LearnerNumber }}</td>
-                                            <td>{{ $license->LicenseNumber }}</td>
-                                            <td>{{ $license->issue_date }}</td>
-                                            <td>{{ $license->expire_date }}</td>
-                                            <td>{{ $license->address }}</td>
-                                            <td>{{ $license->Status }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+    <table class="table table-bordered table-hover mt-3 custom-table" style="font-size: 18px;">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>CNIC</th>
+                <th>License Type</th>
+                <th>Learner Number</th>
+                <th>License Number</th>
+                <th>Issue Date</th>
+                <th>Expire Date</th>
+                <th>Address</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ $license->ApplicantName }}</td>
+                <td>{{ $license->CNIC }}</td>
+                <td>{{ $license->LicenseType }}</td>
+                <td>{{ $license->LearnerNumber }}</td>
+                <td>{{ $license->LicenseNumber }}</td>
+                <td>{{ $license->issue_date }}</td>
+                <td>{{ $license->expire_date }}</td>
+                <td>{{ $license->address }}</td>
+                <td>{{ $license->Status }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
                         @else
                             {{-- Show message if no record found --}}
                             <div class="alert alert-danger mt-3">

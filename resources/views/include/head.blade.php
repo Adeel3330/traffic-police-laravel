@@ -22,5 +22,12 @@
         a{
             text-decoration: none
         }
+        .custom-table,
+.custom-table th,
+.custom-table td {
+    border: 1px solid #d3d3d3 !important; /* Light gray borders */
+    color: #6c757d; /* Bootstrap's gray text */
+}
+
     </style>
 </head>

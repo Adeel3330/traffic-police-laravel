@@ -16,7 +16,7 @@ class ProcessPendingFiles implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public string $fileName;
+    public $fileName;
     public $timeout = 600; // 10 min
     public $tries = 3;
 
