@@ -5,7 +5,7 @@ use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\StorageController;
 use App\Jobs\ProcessPendingFiles;
 
-Route::get('/uploadForm', [StorageController::class, 'index'])->name('storage.index');
+Route::get('/upload', [StorageController::class, 'index'])->name('storage.index');
 Route::post('/storage/upload', [StorageController::class, 'upload'])->name('storage.upload');
 
 Route::get('/verify-license', [LicenseController::class, 'index'])->name('license.form');

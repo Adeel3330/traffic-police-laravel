@@ -8,7 +8,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\LicensesImport;
@@ -17,49 +16,44 @@ class ProcessPendingFiles implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct()
+    public string $fileName;
+    public $timeout = 600; // 10 min
+    public $tries = 3;
+
+    public function __construct(string $fileName)
     {
-        //
+        $this->fileName = $fileName;
     }
 
     public function handle(): void
     {
+        $pendingPath = 'pendingFiles/' . $this->fileName;
+        $fullPath = Storage::disk('public')->path($pendingPath);
+
+        if (!Storage::disk('public')->exists($pendingPath)) {
+            Log::warning("File not found: " . $this->fileName);
+            return;
+        }
+
         try {
-            // Get files from public disk's pendingFiles directory
-            $pendingFiles = Storage::disk('public')->files('pendingFiles');
-            
-            Log::info('ProcessPendingFiles: Found pending files', ['files' => $pendingFiles]);
+            Log::info("Processing file: " . $this->fileName);
 
-            if (empty($pendingFiles)) {
-                Log::info('ProcessPendingFiles: No files to process');
-                return;
-            }
+            // Import with chunk reading
+            Excel::import(new LicensesImport, $fullPath);
 
-            foreach ($pendingFiles as $fileName) {
-                Log::info('ProcessPendingFiles: Processing file', ['file' => $fileName]);
-                
-                $fullPath = Storage::disk('public')->path($fileName);
+            // Move file after success
+            $uploadedPath = 'uploadedFiles/' . $this->fileName;
+            Storage::disk('public')->move($pendingPath, $uploadedPath);
 
-                // Use Excel package to import data
-                Excel::import(new LicensesImport, $fullPath);
-
-                // Move file to uploadedFiles directory
-                $newFileName = str_replace('pendingFiles/', 'uploadedFiles/', $fileName);
-                Storage::disk('public')->move($fileName, $newFileName);
-
-                Log::info('ProcessPendingFiles: File moved to uploadedFiles', [
-                    'original' => $fileName,
-                    'new_path' => $newFileName
-                ]);
-            }
-        } catch (\Exception $e) {
-            Log::error('ProcessPendingFiles: Error occurred', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
+            Log::info("File moved to uploadedFiles", [
+                'original' => $pendingPath,
+                'new' => $uploadedPath,
             ]);
-            
-            // Re-throw to mark job as failed
-            throw $e;
+        } catch (\Exception $e) {
+            Log::error("Error processing file: " . $this->fileName, [
+                'message' => $e->getMessage(),
+            ]);
+            throw $e; // rethrow so job fails properly
         }
     }
 }

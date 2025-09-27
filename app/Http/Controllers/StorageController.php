@@ -16,13 +16,13 @@ class StorageController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:csv,xls,xlsx|max:2048',
+            'file' => 'required|mimes:csv,xls,xlsx|max:20480', // 20 MB
         ]);
 
         // Get original filename
         $originalName = $request->file('file')->getClientOriginalName();
 
-        // Get upload count → increment for next file
+        // Maintain counter for unique file prefix
         $counterFile = 'file_counter.txt';
         $counter = 1;
 
@@ -30,19 +30,17 @@ class StorageController extends Controller
             $counter = (int) Storage::disk('local')->get($counterFile);
             $counter++;
         }
-
-        // Save new counter value
         Storage::disk('local')->put($counterFile, $counter);
 
-        // Final filename → e.g., 1-myfile.csv
+        // Final filename e.g. "5-myfile.csv"
         $newFileName = $counter . '-' . $originalName;
 
-        // Store file with prefixed number
+        // Save in "pendingFiles"
         $path = $request->file('file')->storeAs('pendingFiles', $newFileName, 'public');
 
-        // Dispatch background job
-        ProcessPendingFiles::dispatch();
+        // Dispatch one job for this file only
+        ProcessPendingFiles::dispatch($newFileName);
 
-        return back()->with('success', "File '$newFileName' uploaded successfully! It will be processed soon.");
+        return back()->with('success', "File '$newFileName' uploaded successfully! Processing started.");
     }
 }
