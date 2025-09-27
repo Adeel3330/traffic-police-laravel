@@ -59,8 +59,11 @@
 
                     <div class="navbar-collapse collapse clearfix">
                         <ul class="navigation clearfix">
-                            <li class="current"><a href="{{ url('/') }}">Home</a></li>
-                            <li class="dropdown"><a href="#">Services</a>
+                            {{-- <li class="current"><a href="{{ url('/') }}">Home</a></li> --}}
+                            <li class="{{ request()->is('/') ? 'current' : '' }}">
+                                <a href="{{ url('/') }}">Home</a>
+                            </li>                            
+                            <li class="dropdown {{ request()->is('verify-license') ? 'current' : '' }}"><a href="#">Services</a>
                                 <ul>
                                     <li><a href="{{ route('license.form') }}">Verification</a></li>
                                     <li><a href="#">Track Application</a></li>

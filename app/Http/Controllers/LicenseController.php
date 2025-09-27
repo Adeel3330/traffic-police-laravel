@@ -7,11 +7,14 @@ use App\Models\LicenseStatus;
 
 class LicenseController extends Controller
 {
+    // Show form initially
     public function index()
     {
-        return view('license.verify');
+        $license = null; // always define $license
+        return view('license.verify', compact('license'));
     }
 
+    // Handle form submission
     public function verify(Request $request)
     {
         $request->validate([
@@ -22,6 +25,7 @@ class LicenseController extends Controller
                     ->orderBy('id', 'desc')
                     ->first();
 
+        // even if $license is null, we pass it to view
         return view('license.verify', compact('license'));
     }
 }
