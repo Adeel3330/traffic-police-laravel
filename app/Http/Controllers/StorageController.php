@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Jobs\ProcessPendingFiles;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class StorageController extends Controller
@@ -36,11 +37,16 @@ class StorageController extends Controller
         $newFileName = $counter . '-' . $originalName;
 
         // Save in "pendingFiles"
-        $path = $request->file('file')->storeAs('pendingFiles', $newFileName, 'public');
+        $pendingPath = $request->file('file')->storeAs('pendingFiles', $newFileName, 'public');
 
-        // Dispatch one job for this file only
+        Log::info("File uploaded and saved for processing", [
+            'file' => $newFileName,
+            'path' => $pendingPath
+        ]);
+
+        // Dispatch job to process this file later
         ProcessPendingFiles::dispatch($newFileName);
 
-        return back()->with('success', "File '$newFileName' uploaded successfully! Processing started.");
+        return back()->with('success', "File '$newFileName' uploaded successfully! Processing will happen in background.");
     }
 }

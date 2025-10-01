@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LicenseController;
-use App\Http\Controllers\StorageController;
 use App\Jobs\ProcessPendingFiles;
+use App\Http\Controllers\StorageController;
 
 Route::get('/upload', [StorageController::class, 'index'])->name('storage.index');
 Route::post('/storage/upload', [StorageController::class, 'upload'])->name('storage.upload');
